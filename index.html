@@ -12,7 +12,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 50%;
+            width: 20%;
             background-color: #f3f3f3;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -26,28 +26,63 @@
             line-height: 30px;
             color: white;
         }
+        #background-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: #AA0507;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div id="progress-bar-container">
         <div id="progress-bar">0%</div>
     </div>
+    <button id="background-button">Change Background</button>
     <script src="https://cdn.jsdelivr.net/npm/three@0.126.1/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.126.1/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.126.1/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.126.1/examples/js/loaders/TextureLoader.js"></script>
     <script>
         let scene, camera, renderer, controls, model;
+        const backgrounds = ['gedra.png', 'Mf-Doom-4.jpg', new THREE.Color(0xffffff), new THREE.Color(0x000000)];
+        let backgroundIndex = 0;
 
+        function changeBackground() {
+    const currentBackground = backgrounds[backgroundIndex];
+    if (typeof currentBackground === 'string') {
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(currentBackground, function(texture) {
+            const backgroundTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+            backgroundTexture.texture = texture;
+            scene.background = backgroundTexture.texture;
+        });
+    } else {
+        scene.background = currentBackground;
+    }
+    backgroundIndex = (backgroundIndex + 1) % backgrounds.length;
+}
+
+
+        document.getElementById('background-button').addEventListener('click', changeBackground);
+
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
         function init() {
             // Scene
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xffffff);
+//             scene.background = new THREE.Color(0xffffff);
 
-            const imgloader = new THREE.TextureLoader();
-imgloader.load('Mf-Doom-4.jpg', function(texture) {
-  scene.background = texture;
-});
+//             const imgloader = new THREE.TextureLoader();
+// imgloader.load('gedra.png', function(texture) {
+//   scene.background = texture;
+// });
 
             // Camera
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -124,7 +159,9 @@ const manager = new THREE.LoadingManager();
             const loader = new THREE.GLTFLoader(manager);
             loader.load('GedraBlenderPivotAdjusted.gltf', function(gltf) {
                 model = gltf.scene;
-                model.scale.set(0.5,0.5,0.5);
+                // model.scale.set(0.5,0.5,0.5);
+                const scale = isMobile() ? 0.25 : 0.5; // Set scale based on device type
+                model.scale.set(scale, scale, scale);
                 model.rotation.set(0.2, 0, 0);
                 model.traverse(function(node) {
                     if (node.isMesh) {
