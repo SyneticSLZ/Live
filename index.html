@@ -160,7 +160,7 @@ const manager = new THREE.LoadingManager();
             loader.load('GedraBlenderPivotAdjusted.gltf', function(gltf) {
                 model = gltf.scene;
                 // model.scale.set(0.5,0.5,0.5);
-                const scale = isMobile() ? 0.25 : 0.5; // Set scale based on device type
+                const scale = isMobile() ? 0.45 : 0.5; // Set scale based on device type
                 model.scale.set(scale, scale, scale);
                 model.rotation.set(0.2, 0, 0);
                 model.traverse(function(node) {
